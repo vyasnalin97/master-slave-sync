@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Master Control</title>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #111;
+      color: white;
+      text-align: center;
+      margin-top: 150px;
+    }
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 80px;
+      height: 40px;
+    }
+    .switch input { display: none; }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #333;
+      transition: .4s;
+      border-radius: 40px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 30px; width: 30px;
+      left: 5px; bottom: 5px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    input:checked + .slider {
+      background-color: #DC4826;
+    }
+    input:checked + .slider:before {
+      transform: translateX(40px);
+    }
+  </style>
+</head>
+<body>
+  <h1>Master Switch</h1>
+  <label class="switch">
+    <input type="checkbox" id="masterToggle">
+    <span class="slider"></span>
+  </label>
+
+  <script>
+    // Replace this config with YOUR Firebase project's config
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.database(app);
+
+    const toggle = document.getElementById('masterToggle');
+
+    // Load initial value from Firebase
+    firebase.database().ref("masterState").on("value", snapshot => {
+      const state = snapshot.val();
+      toggle.checked = state === "on";
+    });
+
+    // When toggled, update in Firebase
+    toggle.addEventListener("change", () => {
+      const state = toggle.checked ? "on" : "off";
+      firebase.database().ref("masterState").set(state);
+    });
+  </script>
+</body>
+</html>
