@@ -1,84 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Master Control</title>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #111;
-      color: white;
+      font-family: "Segoe UI", sans-serif;
       text-align: center;
-      margin-top: 150px;
+      padding-top: 80px;
+      background: #0d0d0d;
+      color: white;
+    }
+    h1 {
+      margin-bottom: 30px;
+      font-size: 2em;
+      letter-spacing: 1px;
     }
     .switch {
       position: relative;
       display: inline-block;
       width: 80px;
-      height: 40px;
+      height: 44px;
     }
-    .switch input { display: none; }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
     .slider {
       position: absolute;
       cursor: pointer;
-      top: 0; left: 0; right: 0; bottom: 0;
+      top: 0; left: 0;
+      right: 0; bottom: 0;
       background-color: #333;
       transition: .4s;
-      border-radius: 40px;
+      border-radius: 44px;
+      box-shadow: 0 0 10px rgba(255, 0, 0, 0);
     }
     .slider:before {
       position: absolute;
       content: "";
-      height: 30px; width: 30px;
-      left: 5px; bottom: 5px;
+      height: 36px;
+      width: 36px;
+      left: 4px;
+      bottom: 4px;
       background-color: white;
       transition: .4s;
       border-radius: 50%;
     }
     input:checked + .slider {
-      background-color: #DC4826;
+      background-color: #ff0000;
+      box-shadow: 0 0 20px rgba(255, 0, 0, 0.8);
     }
     input:checked + .slider:before {
-      transform: translateX(40px);
+      transform: translateX(36px);
     }
   </style>
 </head>
 <body>
-  <h1>Master Switch</h1>
+  <h1>Master Control</h1>
   <label class="switch">
-    <input type="checkbox" id="masterToggle">
+    <input type="checkbox" id="toggle">
     <span class="slider"></span>
   </label>
 
-  <script>
-    // Replace this config with YOUR Firebase project's config
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
     const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-      databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_PROJECT_ID.appspot.com",
-      messagingSenderId: "YOUR_SENDER_ID",
-      appId: "YOUR_APP_ID"
+      databaseURL: "https://redd-5feff-default-rtdb.firebaseio.com/"
     };
 
-    const app = firebase.initializeApp(firebaseConfig);
-    const db = firebase.database(app);
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const toggleRef = ref(db, "toggleState");
 
-    const toggle = document.getElementById('masterToggle');
+    const toggle = document.getElementById("toggle");
 
-    // Load initial value from Firebase
-    firebase.database().ref("masterState").on("value", snapshot => {
-      const state = snapshot.val();
-      toggle.checked = state === "on";
-    });
-
-    // When toggled, update in Firebase
     toggle.addEventListener("change", () => {
-      const state = toggle.checked ? "on" : "off";
-      firebase.database().ref("masterState").set(state);
+      set(toggleRef, toggle.checked);
     });
   </script>
 </body>
