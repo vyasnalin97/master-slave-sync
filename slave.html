@@ -1,39 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Slave Display</title>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
   <style>
     body {
-      margin: 0;
-      height: 100vh;
+      font-family: "Segoe UI", sans-serif;
+      text-align: center;
+      padding-top: 80px;
+      background: #0d0d0d;
+      color: white;
+      transition: background 0.4s;
+    }
+    h1 {
+      margin-bottom: 30px;
+      font-size: 2em;
+      letter-spacing: 1px;
+    }
+    .light {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      margin: 0 auto;
       background-color: black;
-      transition: background-color 0.4s ease;
+      box-shadow: 0 0 40px rgba(255, 0, 0, 0);
+      transition: background 0.3s, box-shadow 0.3s;
     }
   </style>
 </head>
 <body>
-  <script>
-    // Replace with same Firebase config
+  <h1>Slave Display</h1>
+  <div class="light" id="light"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
     const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-      databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_PROJECT_ID.appspot.com",
-      messagingSenderId: "YOUR_SENDER_ID",
-      appId: "YOUR_APP_ID"
+      databaseURL: "https://redd-5feff-default-rtdb.firebaseio.com/"
     };
 
-    const app = firebase.initializeApp(firebaseConfig);
-    const db = firebase.database(app);
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const toggleRef = ref(db, "toggleState");
 
-    // Listen for masterState changes
-    firebase.database().ref("masterState").on("value", snapshot => {
-      const state = snapshot.val();
-      document.body.style.backgroundColor = state === "on" ? "red" : "black";
+    const light = document.getElementById("light");
+
+    onValue(toggleRef, (snapshot) => {
+      const isOn = snapshot.val();
+      if (isOn) {
+        light.style.backgroundColor = "red";
+        light.style.boxShadow = "0 0 40px rgba(255, 0, 0, 0.8)";
+      } else {
+        light.style.backgroundColor = "black";
+        light.style.boxShadow = "0 0 40px rgba(255, 0, 0, 0)";
+      }
     });
   </script>
 </body>
